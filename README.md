@@ -63,7 +63,7 @@ Open in your browser http://localhost:4000 (use incogninto window if you get red
 
 
 ### Check SSO from DPAP
-Open DPAP in your browser.
+Open DPAP in your browser in incognito window in your browser redirect automatically to htpps.
 Login with "samuel" user.
 Check redirection to Saml Mock screen and once again, use "Samuel" user. Any password works.
 ![image](https://github.com/user-attachments/assets/4d23dea8-f903-4acb-a472-e06fe6fd5ef6)
