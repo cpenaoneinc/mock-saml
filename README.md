@@ -1,81 +1,74 @@
-# Mock SAML from BoxyHQ
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-[![Deploy with Vercel](https://vercel.com/button)](<https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fboxyhq%2Fmock-saml&env=APP_URL,ENTITY_ID,PUBLIC_KEY,PRIVATE_KEY,NEXT_PUBLIC_GTM_ID&envDescription=APP_URL%20(Usually%20https%3A%2F%2F%3Cproject-name%3E.vercel.app)%20can%20be%20set%20after%20deployment%20from%20the%20project%20dashboard.%20Set%20to%20''%20if%20not%20applicable.&envLink=https%3A%2F%2Fgithub.com%2Fboxyhq%2Fmock-saml%2Fblob%2Fmain%2F.env.example&project-name=mock-saml>)
 
 Mock SAML is a free SAML 2.0 Identity Provider for testing SAML SSO integrations.
 
-## Namespaces
+## Install only on local [NEVER USE FOR PRODUCTION]
 
-Try [Mock SAML](https://mocksaml.com/), our free hosted service. Whilst we use the root domain for our own testing you can create your own unique namespace by navigating to [https://mocksaml.com/namespace/any_name_of_your_choice](https://mocksaml.com/namespace/any_name_of_your_choice).
+### Prerequisites
 
-## Install
+1. Docker Desktop or Rancher.
+2. Run SetupIdentityProvider.batch at the root of Identity Provider Project to ensure Identity Providers Test Data is updated.
+3. Run p1.batch at the root of Process One Project to ensure "samuel" user is created.
 
 ### With Docker
 
-The docker container can be found at [boxyhq/mock-saml](https://hub.docker.com/r/boxyhq/mock-saml).
+To pull mocksaml/oneinc:1.0.0 from the docker client, run the following command:
+
+```
+docker pull proget.oneincsystems.com/dp.dckr/mocksaml/oneinc:1.0.0
+```
+
+The docker image can be found at [Proget Feed](https://proget.oneincsystems.com/containers/tags/DP.Dckr/mocksaml/oneinc/1.0.0/overview).
+
+### Public and Private Key Creation (Reference Only, please use attached Test Private and Public Keys as IDP Test Data has been configured with these Keys)
+```
+# Generate a private/public key combination, this is needed for signing the SAML AuthnRequest
+ openssl req -x509 -newkey rsa:2048 -keyout key.pem -out public.crt -sha256 -days 365000 -nodes
+ Base64 encoded value of public key `cat public.crt | base64`
+ Base64 encoded value of private key `cat key.pem | base64`
+```
+
+#### Test Private and Public Keys
+
+##### TEST_PUBLIC_KEY
+```
+LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlEa1RDQ0FubWdBd0lCQWdJVWVlQTJQdEJVNVRjWnM5R0NuU1dFM3NKY0swUXdEUVlKS29aSWh2Y05BUUVMDQpCUUF3VnpFTE1Ba0dBMVVFQmhNQ1FWVXhDekFKQmdOVkJBZ01Ba1pNTVFzd0NRWURWUVFIREFKR1RERVBNQTBHDQpBMVVFQ2d3R2IyNWxhVzVqTVE4d0RRWURWUVFMREFadmJtVnBibU14RERBS0JnTlZCQU1NQTJObGNqQWdGdzB5DQpOREEzTVRjeE56VTNNalphR0E4ek1ESXpNVEV4T0RFM05UY3lObG93VnpFTE1Ba0dBMVVFQmhNQ1FWVXhDekFKDQpCZ05WQkFnTUFrWk1NUXN3Q1FZRFZRUUhEQUpHVERFUE1BMEdBMVVFQ2d3R2IyNWxhVzVqTVE4d0RRWURWUVFMDQpEQVp2Ym1WcGJtTXhEREFLQmdOVkJBTU1BMk5sY2pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDDQpBUW9DZ2dFQkFMR3VMWThRQlljbXlXSTV2WHowekNlSzdXbDdlZnFvVkJpdElnajlIbnM0ZlZnbzlHc3RBYjU5DQpKUTNhWGFhbmUzUGErVklETGdabDN0dVhNaDFobit2eUNGRlNicUU3cXpwNDkzclQ0MzhaZW0yWmFiYmZHNUY4DQplb1hRQ1pBSUJVeDhvUHA0aDFpbnQ0Qk9tYS9kRng5RnVDUHV5S1poenNwOTRlR2ZmOE5xb0QrdnkxQU1aU25pDQpOdm1KQlA5V1VralpNd2JwM2tsRy9sL0VkUWRlVzFMZkE0cDloRmtGcnVGQXluQnBwck1QREhxQWNTWm5Yc3hCDQpPdjNESC9uTzdHUnZEbUx2SlFTNkZJZDdiR3MvOW80blpybDhSMDVTZUVyeHQydmhHNjQvYXhucUxJRitNWGdMDQoyWnlKT2FlOTl0dHZJMG9hcmVkaHNKSHV2em9CYjhVQ0F3RUFBYU5UTUZFd0hRWURWUjBPQkJZRUZIeVYvRTk2DQpnNGZ1R2tLMzg4SWlheWdZTmJNck1COEdBMVVkSXdRWU1CYUFGSHlWL0U5Nmc0ZnVHa0szODhJaWF5Z1lOYk1yDQpNQThHQTFVZEV3RUIvd1FGTUFNQkFmOHdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBQnM2QkI2ek5qWG5CY1RUDQp4UEV0UWJ2QUsxOG43Sktra3hNS1RGQ3o1YmJSSlVQUjl5ekJqTVBxTmZUNGh4dmZySk4rdHpqNFZKNXFSOEdHDQp6akVXUGYrWmc3MmVoUmtOaTVta1pzU3A3cng0OW1Zd21ndjRTWnRuclJ2azZwZDVQMEliN1Rsb2g1aElaeTJyDQpHY3JDMExQaGNkQTRTZzZsNkJnR242OHJCZkgvTE0wWk9DcGZFVVFmV1A2TTBIM3Q0K0QzTUs3YlNQSVVwdzBkDQp6cWc4T1FrVU9hSkJLTU9hZVB3RVM5QSt6NnRsUGNORjhnMGtvNFA2WWlYT0xuMC8xdXpQNzNPdzk5NUZCRXd2DQoyeEtZQjZKOHpRdk8xZDNQYXUwbDNPYWFvcHUwb2JVR29PNVRaRS9CL2dPTGZXdGZYbWw4NWtqYmZscTNRSDZYDQpDalNBbjJFPQ0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ0K
+```
+
+##### TEST_PRIVATE_KEY
+```
+LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tDQpNSUlFdmdJQkFEQU5CZ2txaGtpRzl3MEJBUUVGQUFTQ0JLZ3dnZ1NrQWdFQUFvSUJBUUN4cmkyUEVBV0hKc2xpDQpPYjE4OU13bml1MXBlM242cUZRWXJTSUkvUjU3T0gxWUtQUnJMUUcrZlNVTjJsMm1wM3R6MnZsU0F5NEdaZDdiDQpseklkWVovcjhnaFJVbTZoTzZzNmVQZDYwK04vR1hwdG1XbTIzeHVSZkhxRjBBbVFDQVZNZktENmVJZFlwN2VBDQpUcG12M1JjZlJiZ2o3c2ltWWM3S2ZlSGhuMy9EYXFBL3I4dFFER1VwNGpiNWlRVC9WbEpJMlRNRzZkNUpSdjVmDQp4SFVIWGx0UzN3T0tmWVJaQmE3aFFNcHdhYWF6RHd4NmdIRW1aMTdNUVRyOXd4LzV6dXhrYnc1aTd5VUV1aFNIDQplMnhyUC9hT0oyYTVmRWRPVW5oSzhiZHI0UnV1UDJzWjZpeUJmakY0QzltY2lUbW52ZmJiYnlOS0dxM25ZYkNSDQo3cjg2QVcvRkFnTUJBQUVDZ2dFQUl5VmNmcTJCSW14Q0xvdFVWNWpHbjFYRVEzYTR1S08rU3NsSWI3Vzk1MHJUDQp4SElKY3YvS2xnY0VJdHJjWm9BL2s3bXZVcEV0Yy9lSG56RW5xUmNyL294NEo3bmlCME9aeWEydTZsMXFaVFJCDQpldGQ3U1VDVm4vQWEva2daOUNNYUJUaXIwUSt4V2hDRzVEcm4vSmtEbjF4M29hZjBpYkRVS2txL09SV0hQTHlRDQp1NGQxTStXT29wWkNQS0poUUJIbEZ6TmI3OFF0d2tsY1o3MW9CQmxnV0M2T0JmUHhpTktrRXpQMHFKZU1zUWZQDQpvSm10ekp3cGVTM2NPRlJ5NHNvREMvYnJVcm5XQUJLZ3BvZ3RtUGhHdExsT285OURMM1lTWjl4blZBZTRFQ01uDQp0eWdJUHp5SHZtVzVIQVFrbTFOdU5oR0U3SFl3RUQ4YnBjOXBmR3dGa1FLQmdRRGRCNFh2eEFpcll2c2g5cDdsDQpQQzY3MVlHa25xVjlmNUxuY2s5K0JUaHBhaXhQemRkWGJIWFNRUkF1RUZ2SDFwTHBjNUI2c0JaNVpiazdHaEI4DQp6amR6eHl1VUVyb3EwMnlmTFA3aitnRWk1UllQK0FIT3p6MWloWEVYdjl2azQ0b3UyYlFTYzNoN0U2cnB1NUxPDQoxaDFGWndVVGUxcXEybG1DNUJqSWJvc0NTUUtCZ1FETnl0MmxmWVpCK1hCemIvZ2VIVWZRRjZUeDdISkgvc3IrDQpRREdldDFEMDZOUVNYalRHTmZOMkxXOWh2a0c0K1Q5Wm9hS2MzdXV0WmlaQ2t1Z0tlZGdiMllaSFhIb2VubjdJDQpyUXVhVnoxNGVhU3JjTUxxQ0IzbnNRSU9mMlkrSnBSL0djYitNZnpFWW9OZCtrWXlIU0hyOTZTNC9Ldld6cTlWDQoyNExjRWNqQm5RS0JnUURSLzJYWGlZOGJGcTIzZFJNK2hORjZFTDVkNDRVa0dXTS9sckhENzczTEdkOEQ2M1FmDQpVYU1Yb2sxM0ZuKzgvRGNVcW9Hb3IwaUxDb1RVakUwQjV3TjBjdFVLbUVoY2pBZDFyRkIzMVgzaTQzajByeE00DQpwRm1VRTJpQndmMXdHR2VmWDZQZ3EramFOck41NG9iM0VTTTZYMGpKVzdlbkFGRnZOTHYvSWxmY1VRS0JnUUM2DQpoWXl2V2o0OXZkLzJRUjRaN1dBUmM5ekVpUkpydnJ3dUJmRHpjaU9tVndFZ1JOS0FkSlhlSHdBOUR6eHljemEvDQovb2hzdG4vV0FpZmJYMXVCWXo1RXY3dTlJa3h0UkNxVnFJSkR1WjYxZTB1Tk4vN3lMN2tyTG53MnQ3SHIwdnYwDQoxMkJOTlBGczdmMHpTSXduRDlDWEZ6WHRsTllMTS9vblQzWWtFTnBzNFFLQmdFNERYNmVYNW9WQWphSzcxUWpvDQpqaFN4QWl4ZERoa0N1ejhQQmMwNHBtYmVMeFdkczNDR2FLRjBxeDhkbm9pNk1ndjV3TkRENkE1SzFWcVhnQUs0DQpzR0p1Rm42MW01MWNGSXkwMlpobzY4WWpRaG9veHBUTnYwOERscHdpVjgwTVRhd0xsL0ZlaDl0elJqY2VJQ3RqDQpSNVpZbWt3YW9lTjdhbWtrb1UzV1l5eEoNCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0NCg==
+```
+
+
+### Docker Run Command Structure
 
 ```bash
 docker run \
   -p 4000:4000 \
   -e APP_URL="http://localhost:4000" \
-  -e ENTITY_ID="https://saml.example.com/entityid" \
-  -e PUBLIC_KEY="<PUBLIC_KEY>" \
-  -e PRIVATE_KEY="<PRIVATE_KEY>" \
-  -d boxyhq/mock-saml
+  -e ENTITY_ID="https://localhost/OneInc.IdentityProvider/sp1/saml" \
+  -e PUBLIC_KEY="<TEST_PUBLIC_KEY>" \
+  -e PRIVATE_KEY="<TEST_PRIVATE_KEY>" \
+  -d proget.oneincsystems.com/dp.dckr/mocksaml/oneinc:1.0.0
 ```
 
-Refer to [env.example](https://github.com/boxyhq/mock-saml/blob/main/.env.example#L5C3-L5C97) for instructions on how to create the key pair.
-Replace `<PUBLIC_KEY>` with Base64 encoded value of public key.
-Replace `<PRIVATE_KEY>` with Base64 encoded value of private key.
-
-### Without Docker
-
+And here's the complete command that must be executed
 ```
-git clone https://github.com/boxyhq/mock-saml.git
+docker run -p 4000:4000 -e APP_URL="http://localhost:4000" -e ENTITY_ID="https://localhost/OneInc.IdentityProvider/sp1/saml" -e PUBLIC_KEY="LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlEa1RDQ0FubWdBd0lCQWdJVWVlQTJQdEJVNVRjWnM5R0NuU1dFM3NKY0swUXdEUVlKS29aSWh2Y05BUUVMDQpCUUF3VnpFTE1Ba0dBMVVFQmhNQ1FWVXhDekFKQmdOVkJBZ01Ba1pNTVFzd0NRWURWUVFIREFKR1RERVBNQTBHDQpBMVVFQ2d3R2IyNWxhVzVqTVE4d0RRWURWUVFMREFadmJtVnBibU14RERBS0JnTlZCQU1NQTJObGNqQWdGdzB5DQpOREEzTVRjeE56VTNNalphR0E4ek1ESXpNVEV4T0RFM05UY3lObG93VnpFTE1Ba0dBMVVFQmhNQ1FWVXhDekFKDQpCZ05WQkFnTUFrWk1NUXN3Q1FZRFZRUUhEQUpHVERFUE1BMEdBMVVFQ2d3R2IyNWxhVzVqTVE4d0RRWURWUVFMDQpEQVp2Ym1WcGJtTXhEREFLQmdOVkJBTU1BMk5sY2pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDDQpBUW9DZ2dFQkFMR3VMWThRQlljbXlXSTV2WHowekNlSzdXbDdlZnFvVkJpdElnajlIbnM0ZlZnbzlHc3RBYjU5DQpKUTNhWGFhbmUzUGErVklETGdabDN0dVhNaDFobit2eUNGRlNicUU3cXpwNDkzclQ0MzhaZW0yWmFiYmZHNUY4DQplb1hRQ1pBSUJVeDhvUHA0aDFpbnQ0Qk9tYS9kRng5RnVDUHV5S1poenNwOTRlR2ZmOE5xb0QrdnkxQU1aU25pDQpOdm1KQlA5V1VralpNd2JwM2tsRy9sL0VkUWRlVzFMZkE0cDloRmtGcnVGQXluQnBwck1QREhxQWNTWm5Yc3hCDQpPdjNESC9uTzdHUnZEbUx2SlFTNkZJZDdiR3MvOW80blpybDhSMDVTZUVyeHQydmhHNjQvYXhucUxJRitNWGdMDQoyWnlKT2FlOTl0dHZJMG9hcmVkaHNKSHV2em9CYjhVQ0F3RUFBYU5UTUZFd0hRWURWUjBPQkJZRUZIeVYvRTk2DQpnNGZ1R2tLMzg4SWlheWdZTmJNck1COEdBMVVkSXdRWU1CYUFGSHlWL0U5Nmc0ZnVHa0szODhJaWF5Z1lOYk1yDQpNQThHQTFVZEV3RUIvd1FGTUFNQkFmOHdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBQnM2QkI2ek5qWG5CY1RUDQp4UEV0UWJ2QUsxOG43Sktra3hNS1RGQ3o1YmJSSlVQUjl5ekJqTVBxTmZUNGh4dmZySk4rdHpqNFZKNXFSOEdHDQp6akVXUGYrWmc3MmVoUmtOaTVta1pzU3A3cng0OW1Zd21ndjRTWnRuclJ2azZwZDVQMEliN1Rsb2g1aElaeTJyDQpHY3JDMExQaGNkQTRTZzZsNkJnR242OHJCZkgvTE0wWk9DcGZFVVFmV1A2TTBIM3Q0K0QzTUs3YlNQSVVwdzBkDQp6cWc4T1FrVU9hSkJLTU9hZVB3RVM5QSt6NnRsUGNORjhnMGtvNFA2WWlYT0xuMC8xdXpQNzNPdzk5NUZCRXd2DQoyeEtZQjZKOHpRdk8xZDNQYXUwbDNPYWFvcHUwb2JVR29PNVRaRS9CL2dPTGZXdGZYbWw4NWtqYmZscTNRSDZYDQpDalNBbjJFPQ0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ0K"   -e PRIVATE_KEY="LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tDQpNSUlFdmdJQkFEQU5CZ2txaGtpRzl3MEJBUUVGQUFTQ0JLZ3dnZ1NrQWdFQUFvSUJBUUN4cmkyUEVBV0hKc2xpDQpPYjE4OU13bml1MXBlM242cUZRWXJTSUkvUjU3T0gxWUtQUnJMUUcrZlNVTjJsMm1wM3R6MnZsU0F5NEdaZDdiDQpseklkWVovcjhnaFJVbTZoTzZzNmVQZDYwK04vR1hwdG1XbTIzeHVSZkhxRjBBbVFDQVZNZktENmVJZFlwN2VBDQpUcG12M1JjZlJiZ2o3c2ltWWM3S2ZlSGhuMy9EYXFBL3I4dFFER1VwNGpiNWlRVC9WbEpJMlRNRzZkNUpSdjVmDQp4SFVIWGx0UzN3T0tmWVJaQmE3aFFNcHdhYWF6RHd4NmdIRW1aMTdNUVRyOXd4LzV6dXhrYnc1aTd5VUV1aFNIDQplMnhyUC9hT0oyYTVmRWRPVW5oSzhiZHI0UnV1UDJzWjZpeUJmakY0QzltY2lUbW52ZmJiYnlOS0dxM25ZYkNSDQo3cjg2QVcvRkFnTUJBQUVDZ2dFQUl5VmNmcTJCSW14Q0xvdFVWNWpHbjFYRVEzYTR1S08rU3NsSWI3Vzk1MHJUDQp4SElKY3YvS2xnY0VJdHJjWm9BL2s3bXZVcEV0Yy9lSG56RW5xUmNyL294NEo3bmlCME9aeWEydTZsMXFaVFJCDQpldGQ3U1VDVm4vQWEva2daOUNNYUJUaXIwUSt4V2hDRzVEcm4vSmtEbjF4M29hZjBpYkRVS2txL09SV0hQTHlRDQp1NGQxTStXT29wWkNQS0poUUJIbEZ6TmI3OFF0d2tsY1o3MW9CQmxnV0M2T0JmUHhpTktrRXpQMHFKZU1zUWZQDQpvSm10ekp3cGVTM2NPRlJ5NHNvREMvYnJVcm5XQUJLZ3BvZ3RtUGhHdExsT285OURMM1lTWjl4blZBZTRFQ01uDQp0eWdJUHp5SHZtVzVIQVFrbTFOdU5oR0U3SFl3RUQ4YnBjOXBmR3dGa1FLQmdRRGRCNFh2eEFpcll2c2g5cDdsDQpQQzY3MVlHa25xVjlmNUxuY2s5K0JUaHBhaXhQemRkWGJIWFNRUkF1RUZ2SDFwTHBjNUI2c0JaNVpiazdHaEI4DQp6amR6eHl1VUVyb3EwMnlmTFA3aitnRWk1UllQK0FIT3p6MWloWEVYdjl2azQ0b3UyYlFTYzNoN0U2cnB1NUxPDQoxaDFGWndVVGUxcXEybG1DNUJqSWJvc0NTUUtCZ1FETnl0MmxmWVpCK1hCemIvZ2VIVWZRRjZUeDdISkgvc3IrDQpRREdldDFEMDZOUVNYalRHTmZOMkxXOWh2a0c0K1Q5Wm9hS2MzdXV0WmlaQ2t1Z0tlZGdiMllaSFhIb2VubjdJDQpyUXVhVnoxNGVhU3JjTUxxQ0IzbnNRSU9mMlkrSnBSL0djYitNZnpFWW9OZCtrWXlIU0hyOTZTNC9Ldld6cTlWDQoyNExjRWNqQm5RS0JnUURSLzJYWGlZOGJGcTIzZFJNK2hORjZFTDVkNDRVa0dXTS9sckhENzczTEdkOEQ2M1FmDQpVYU1Yb2sxM0ZuKzgvRGNVcW9Hb3IwaUxDb1RVakUwQjV3TjBjdFVLbUVoY2pBZDFyRkIzMVgzaTQzajByeE00DQpwRm1VRTJpQndmMXdHR2VmWDZQZ3EramFOck41NG9iM0VTTTZYMGpKVzdlbkFGRnZOTHYvSWxmY1VRS0JnUUM2DQpoWXl2V2o0OXZkLzJRUjRaN1dBUmM5ekVpUkpydnJ3dUJmRHpjaU9tVndFZ1JOS0FkSlhlSHdBOUR6eHljemEvDQovb2hzdG4vV0FpZmJYMXVCWXo1RXY3dTlJa3h0UkNxVnFJSkR1WjYxZTB1Tk4vN3lMN2tyTG53MnQ3SHIwdnYwDQoxMkJOTlBGczdmMHpTSXduRDlDWEZ6WHRsTllMTS9vblQzWWtFTnBzNFFLQmdFNERYNmVYNW9WQWphSzcxUWpvDQpqaFN4QWl4ZERoa0N1ejhQQmMwNHBtYmVMeFdkczNDR2FLRjBxeDhkbm9pNk1ndjV3TkRENkE1SzFWcVhnQUs0DQpzR0p1Rm42MW01MWNGSXkwMlpobzY4WWpRaG9veHBUTnYwOERscHdpVjgwTVRhd0xsL0ZlaDl0elJqY2VJQ3RqDQpSNVpZbWt3YW9lTjdhbWtrb1UzV1l5eEoNCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0NCg==" -d proget.oneincsystems.com/dp.dckr/mocksaml/oneinc:1.0.0
 ```
 
-```
-cd mock-saml
-```
+### Check Saml Mock is running
+Open in your browser http://localhost:4000 (use incogninto window if you get redirect to https) 
+![image](https://github.com/user-attachments/assets/d50b7ba9-a806-4220-aa33-c866e60d937b)
 
-Install dependencies
 
-```
-npm install
-```
+### Check SSO from DPAP
+Open DPAP in your browser.
+Login with "samuel" user.
+Check redirection to Saml Mock screen and once again, use "Samuel" user. Any password works.
+![image](https://github.com/user-attachments/assets/4d23dea8-f903-4acb-a472-e06fe6fd5ef6)
+Click on "Sing In" and you'll be authenticated into DPAP
 
-Update `.env` with your own keys.
 
-```
-cp .env.example .env
-```
 
-Build the Next.js app.
 
-```
-npm run build
-```
-
-Run the Mock SAML server.
-
-```
-npm run start
-```
-
-## Contributing
-
-Thanks for taking the time to contribute! Contributions make the open-source community a fantastic place to learn, inspire, and create. Any contributions you make are greatly appreciated.
-
-Please try to create bug reports that are:
-
-- _Reproducible._ Include steps to reproduce the problem.
-- _Specific._ Include as much detail as possible: which version, what environment, etc.
-- _Unique._ Do not duplicate existing opened issues.
-- _Scoped to a Single Bug._ One bug per report.
-
-## Community
-
-- [Discord](https://discord.gg/uyb7pYt4Pa) (For live discussion with the Open-Source Community and BoxyHQ team)
-- [Twitter](https://twitter.com/BoxyHQ) (Follow us)
-- [GitHub Issues](https://https://github.com/boxyhq/mock-saml/issues) (Contributions, report issues and product ideas)
